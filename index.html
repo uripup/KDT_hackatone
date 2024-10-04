@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kakao 지도 시작하기</title>
+</head>
+<body>
+<div>
+    <input type="text" id="keyword" placeholder="검색어를 입력하세요">
+    <button onclick="searchPlaces()">검색</button>
+</div>
+<div id="map" style="width:1000px;height:900px;"></div>
+
+<!-- 검색 결과 JSON을 출력할 영역 추가 -->
+<pre id="result"></pre>
+
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=c64ce618b4610ac7f30a8cabf3439743&libraries=services"></script>
+<script>
+    var infowindow = new kakao.maps.InfoWindow({zIndex:1});
+    var container = document.getElementById('map');
+    var options = {
+        center: new kakao.maps.LatLng(33.450701, 126.570667),
+        level: 3
+    };
+
+    var map = new kakao.maps.Map(container, options);
+    var ps = new kakao.maps.services.Places();
+
+    // 검색어 입력 후 검색하는 함수
+    function searchPlaces() {
+        var keyword = document.getElementById('keyword').value;
+        if (!keyword.trim()) {
+            alert('키워드를 입력해주세요!');
+            return;
+        }
+
+        // 검색 실행
+        ps.keywordSearch(keyword, function(data, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                filterAndDisplayPlaces(data, keyword);  // 필터링 함수로 데이터 전달
+            } else {
+                alert('검색 결과가 없습니다.');
+            }
+        });
+    }
+
+    // 필터링 및 데이터 처리 함수
+    function filterAndDisplayPlaces(data, keyword) {
+        // 검색어에서 첫 번째 단어만 추출 (필터링에 사용)
+        var firstKeyword = keyword.split(' ')[0];
+
+        // 첫 번째 키워드를 포함하는 장소만 필터링
+        var filteredData = data.filter(function(place) {
+            return place.address_name.includes(firstKeyword);
+        });
+
+        // 필터링된 데이터를 JSON 형식으로 출력
+        document.getElementById('result').textContent = JSON.stringify(filteredData, null, 2);
+
+        // 지도에 마커 표시
+        var bounds = new kakao.maps.LatLngBounds();
+        for (var i = 0; i < filteredData.length; i++) {
+            displayMarker(filteredData[i]);
+            bounds.extend(new kakao.maps.LatLng(filteredData[i].y, filteredData[i].x));
+        }
+        map.setBounds(bounds);
+    }
+
+    // 지도에 마커를 표시하는 함수
+    function displayMarker(place) {
+        var marker = new kakao.maps.Marker({
+            map: map,
+            position: new kakao.maps.LatLng(place.y, place.x)
+        });
+        kakao.maps.event.addListener(marker, 'click', function() {
+            infowindow.setContent('<div style="padding:5px;font-size:12px;">' + place.place_name + '</div>');
+            infowindow.open(map, marker);
+        });
+    }
+</script>
+</body>
+</html>
