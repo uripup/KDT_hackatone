@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=17746c09b01053b250683044795a60fc&libraries=services"></script>
-    <title>Document</title>
+    <title>맘편이 지도</title>
     <style>
         html, body {
             margin: 0; /* 기본 여백 제거 */
@@ -119,7 +119,6 @@
 <div class="map-container">
     <div class="toggle-button" onclick="toggleNewBox()">⬅</div> <!-- 새로운 버튼 -->
     <div class="search-box">
-
         <input type="text" id="searchInput" placeholder="검색어를 입력하세요" onkeyup="!this.value && checkInput()" class="search-input">
         <button class="search-button" onclick="searchFunction()">검색</button>
 
@@ -164,6 +163,9 @@
         navigator.geolocation.getCurrentPosition(function (position) {
             var lat = position.coords.latitude, // 위도
                 lon = position.coords.longitude; // 경도
+
+            console.log(lat)
+            console.log(lon)
 
             var locPosition = new kakao.maps.LatLng(lat, lon); // 마커가 표시될 위치
             map.setCenter(locPosition);
@@ -240,6 +242,7 @@
         // 마커 클릭 시 인포윈도우 열기
         kakao.maps.event.addListener(marker, 'click', function () {
             infowindow.open(map, marker);
+            infowindow.getPosision();
         });
     }
 
