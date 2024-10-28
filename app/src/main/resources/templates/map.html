@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=17746c09b01053b250683044795a60fc&libraries=services"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <title>맘편이 지도</title>
     <style>
         html, body {
@@ -114,7 +115,6 @@
         }
     </style>
 </head>
-
 <body>
 <div class="map-container">
     <div class="toggle-button" onclick="toggleNewBox()">⬅</div> <!-- 새로운 버튼 -->
@@ -150,6 +150,24 @@
 </div>
 
 <script>
+    fetch('/map/data')
+        .then(response => response.json())
+        .then(parsedData => {
+            // `parsedData`에서 `data`라는 키로 접근
+            const data = parsedData.data;
+
+            for (let key in data) {
+                if (data.hasOwnProperty(key)) {
+                    let value = data[key];
+                    console.log("Key:", key, "Value:", value);
+
+                    var location = new kakao.maps.LatLng(value.wgs84Lat, value.wgs84Lon);
+                    displayMarker(location)
+                }
+            }
+        })
+        .catch(error => console.error('Error fetching data:', error));
+
     var container = document.getElementById('map'); // 지도를 담을 영역의 DOM 레퍼런스
     var options = { // 지도를 생성할 때 필요한 기본 옵션
         center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표.
@@ -163,9 +181,6 @@
         navigator.geolocation.getCurrentPosition(function (position) {
             var lat = position.coords.latitude, // 위도
                 lon = position.coords.longitude; // 경도
-
-            console.log(lat)
-            console.log(lon)
 
             var locPosition = new kakao.maps.LatLng(lat, lon); // 마커가 표시될 위치
             map.setCenter(locPosition);
@@ -274,5 +289,4 @@
     }
 </script>
 </body>
-
 </html>
