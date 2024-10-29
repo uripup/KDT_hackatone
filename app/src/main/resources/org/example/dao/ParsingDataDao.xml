@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.dao.ParsingDataDao">
+
+    <resultMap id="data" type="org.example.vo.PublicData">
+        <id column="id" property="id" />
+        <result column="rnum" property="rnum" />
+        <result column="name" property="name" />
+        <result column="lon" property="wgs84Lon"/>
+        <result column="lat" property="wgs84Lat"/>
+    </resultMap>
+
+    <insert id="saveData" parameterType="org.example.vo.PublicData" useGeneratedKeys="true">
+        INSERT INTO public_data(id, rnum, name, lon, lat) VALUE (#{id}, #{rnum}, #{name}, #{wgs84Lon}, #{wgs84Lat})
+    </insert>
+</mapper>

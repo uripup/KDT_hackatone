@@ -1,13 +1,10 @@
 package org.example.controller;
 
-import org.example.ParsingData;
-import org.example.vo.PublicData;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
 import java.net.URLEncoder;
@@ -24,14 +21,9 @@ public class MapController {
     public HashMap<String, Object> getDataAndRedirect(HttpSession session) throws Exception {
         HashMap<String, Object> data = new HashMap<>();
 
-        String key = "SdeVRGxeat0HFsYbWRArfdmvZr9D7A4%2FN1IDlh2HxrZcOrO4OX51OU%2FswL7U2GWnhJsKoUjz6OxrW05kc7TYlg%3D%3D";
-        String urlBuild1 = "http://apis.data.go.kr/B552657/ErmctInsttInfoInqireService/getParmacyBassInfoInqire" +
-                "?" + URLEncoder.encode("serviceKey", "UTF-8") + "=" + key +
-                "&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("1000", "UTF-8") +
-                "&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + URLEncoder.encode("1", "UTF-8");
+        data.put("data", null);
 
-        ParsingData parsingData = new ParsingData();
-        data.put("data", parsingData.xmlParsing(urlBuild1));
+        session.setAttribute("data", data);
 
         return data;
     }
