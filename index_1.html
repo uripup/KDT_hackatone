@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=17746c09b01053b250683044795a60fc&libraries=services"></script>
+    <title>Document</title>
+    <style>
+        html, body {
+            margin: 0; /* 기본 여백 제거 */
+            padding: 0; /* 기본 패딩 제거 */
+            overflow: hidden; /* 스크롤 숨기기 */
+        }
+
+        .map-container {
+            position: relative;
+            width: 100%; /* 너비를 100%로 설정 */
+            height: 100vh; /* 높이를 100vh로 설정 */
+            margin: 0 auto;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .toggle-button {
+            position: absolute;
+            left: 10px; /* 왼쪽 위치 */
+            top: 50%; /* 세로 중앙 */
+            transform: translateY(-50%); /* 세로 중앙 맞추기 */
+            width: 40px; /* 너비 */
+            height: 100px; /* 높이 */
+            background-color: #f0f0f0; /* 배경색 */
+            border: none;
+            border-radius: 5px; /* 모서리 둥글게 */
+            cursor: pointer;
+            z-index: 1000; /* 하얀 박스보다 위에 위치 */
+            font-size: 24px; /* 버튼 글씨 크기 */
+        }
+
+        .new-box {
+            position: absolute;
+            left: 0px; /* 기존 박스와 같은 위치 */
+            width: 900px; /* 너비 */
+            height: 1080px; /* 높이 자동 */
+            background: white; /* 배경색 하얀색 */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* 그림자 추가 */
+            z-index: 999; /* 기존 박스보다 아래에 위치 */
+            padding: 20px; /* 내부 여백 */
+        }
+
+        .search-box {
+            position: absolute;
+            left: 50%; /* 중앙 정렬을 위한 위치 설정 */
+            transform: translateX(-50%); /* 중앙으로 이동 */
+            width: 1850px; /* 원하는 너비 */
+            height: 100px; /* 높이를 100px로 설정 */
+            background: white; /* 배경색 하얀색 */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* 그림자 추가 */
+            z-index: 1000; /* 맨 위에 위치 */
+            display: flex; /* 플렉스박스를 사용하여 정렬 */
+            align-items: center; /* 세로 중앙 정렬 */
+            justify-content: center; /* 가로 중앙 정렬 */
+        }
+
+        .search-input {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 300px;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 1001; /* 검색창이 상자 위에 위치하도록 설정 */
+        }
+
+        .input-group {
+            display: flex; /* 플렉스박스를 사용하여 정렬 */
+            justify-content: center; /* 가로 중앙 정렬 */
+            margin: 10px 0; /* 위아래 여백 추가 */
+        }
+
+        .additional-input {
+            padding: 10px; /* 안쪽 여백 추가 */
+            border-radius: 5px; /* 모서리 둥글게 */
+            border: 1px solid #ccc; /* 테두리 스타일 */
+            margin: 0 5px; /* 좌우 여백 추가 */
+            flex: 1; /* 가로 공간을 균등하게 차지 */
+        }
+
+        .button-group {
+            display: flex; /* 플렉스박스를 사용하여 정렬 */
+            justify-content: center; /* 가로 중앙 정렬 */
+            margin: 10px 0; /* 위아래 여백 추가 */
+        }
+
+        .label-button {
+            padding: 10px 15px; /* 안쪽 여백 추가 */
+            border: none; /* 기본 테두리 제거 */
+            background-color: #ffdddd; /* 버튼 배경색 */
+            border-radius: 5px; /* 모서리 둥글게 */
+            margin: 0 5px; /* 좌우 여백 추가 */
+            cursor: pointer; /* 커서 포인터 변경 */
+        }
+
+        .login-button, .signup-button {
+            padding: 10px 15px; /* 안쪽 여백 추가 */
+            border: none; /* 기본 테두리 제거 */
+            background-color: #ff4081; /* 버튼 배경색 */
+            color: white; /* 글자 색상 */
+            border-radius: 5px; /* 모서리 둥글게 */
+            cursor: pointer; /* 커서 포인터 변경 */
+            margin-left: 10px; /* 좌측 여백 추가 */
+        }
+    </style>
+</head>
+
+<body>
+<div class="map-container">
+    <div class="toggle-button" onclick="toggleNewBox()">⬅</div> <!-- 새로운 버튼 -->
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="검색어를 입력하세요" onkeyup="searchFunction()" class="search-input">
+        <div class="input-group">
+            <input type="text" class="additional-input" placeholder="지역 추가">
+            <input type="text" class="additional-input" placeholder="태그 추가">
+        </div>
+        <div class="button-group">
+            <button class="label-button">Label</button>
+            <button class="label-button">Label</button>
+            <button class="label-button">Label</button>
+            <button class="label-button">Label</button>
+            <button class="label-button">Label</button>
+        </div>
+        <button class="login-button">로그인</button>
+        <button class="signup-button">회원가입</button>
+    </div>
+    <div class="new-box" id="newBox" style="display: none;"> <!-- 새로운 하얀 박스 -->
+        <p>새로운 박스 내용</p>
+        <p>새로운 박스 내용</p>
+        <p>새로운 박스 내용</p>
+        <p>여기서부턴 혜정누나가 해주세요 ^^</p>
+        <div class="new-labels">
+            <button class="label">New Label 1</button>
+            <button class="label">New Label 2</button>
+        </div>
+    </div>
+    <div id="map" style="width:1850px; height:1000px; margin: 0 auto;"></div>
+</div>
+
+<script>
+    var locPosition;
+    var container = document.getElementById('map'); // 지도를 담을 영역의 DOM 레퍼런스
+    var options = { // 지도를 생성할 때 필요한 기본 옵션
+        center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표.
+        level: 3 // 지도의 레벨(확대, 축소 정도)
+    };
+    var map = new kakao.maps.Map(container, options);
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            var lat = position.coords.latitude, // 위도
+                lon = position.coords.longitude; // 경도
+
+            var locPosition = new kakao.maps.LatLng(lat, lon); // 마커가 표시될 위치
+            map.setCenter(locPosition);
+
+            // 마커와 인포윈도우를 표시
+            displayMarker(locPosition);
+        });
+    } else {
+        var locPosition = new kakao.maps.LatLng(33.450701, 126.570667);
+        map.setCenter(locPosition);
+        displayMarker(locPosition, 'geolocation을 사용할 수 없어요..');
+    }
+
+    function searchFunction() {
+        let input = document.getElementById('searchInput').value.toLowerCase();
+
+        var ps = new kakao.maps.services.Places(); // 장소 검색 객체 생성
+        if(input != null){
+            removeMarkers();
+        }
+        // 키워드로 장소 검색
+        ps.keywordSearch(input, placesSearchCB);
+
+        function placesSearchCB(data, status, pagination) {
+            if (status === kakao.maps.services.Status.OK) {
+                var bounds = new kakao.maps.LatLngBounds();
+
+                for (var i = 0; i < data.length; i++) {
+                    displayMarker(data[i]);
+                    bounds.extend(new kakao.maps.LatLng(data[i].y, data[i].x));
+                }
+
+                if (pagination.hasNextPage) {
+                    pagination.nextPage();
+                }
+                // 지도 범위 재설정
+                map.setBounds(bounds);
+            }
+        }
+    }
+    var markers = [];  // 마커를 저장할 배열
+
+    function displayMarker(place) {
+        var markerPosition;
+
+        if (place.y && place.x) {
+            markerPosition = new kakao.maps.LatLng(place.y, place.x);
+        } else {
+            markerPosition = place;
+        }
+
+        // 새로운 마커를 생성
+        var marker = new kakao.maps.Marker({
+            map: map,
+            position: markerPosition
+        });
+
+        // 마커를 markers 배열에 저장
+        markers.push(marker);
+
+        // 인포윈도우 생성
+        var infowindow = new kakao.maps.InfoWindow({
+            content: '<div style="padding:5px;">' + (place.place_name || "현 위치") + '</div>'
+        });
+
+        // 마커 클릭 시 인포윈도우 열기
+        kakao.maps.event.addListener(marker, 'click', function () {
+            infowindow.open(map, marker);
+        });
+    }
+
+    // 기존 마커를 모두 제거하는 함수
+    function removeMarkers() {
+        for (var i = 0; i < markers.length; i++) {
+            markers[i].setMap(null);  // 각 마커를 지도에서 제거
+        }
+        markers = [];  // 마커 배열 초기화
+    }
+
+    document.getElementById('searchInput').addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {  // 엔터 키가 눌리면
+            searchFunction();         // 검색 실행
+        }
+    });
+
+    function toggleNewBox() {
+        var newBox = document.getElementById('newBox');
+        if (newBox.style.display === 'none') {
+            newBox.style.display = 'block'; // 새로운 박스 보이기
+        } else {
+            newBox.style.display = 'none'; // 새로운 박스 숨기기
+        }
+    }
+</script>
+</body>
+
+</html>
