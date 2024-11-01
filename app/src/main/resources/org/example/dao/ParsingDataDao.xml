@@ -12,7 +12,21 @@
         <result column="lat" property="wgs84Lat"/>
     </resultMap>
 
-    <insert id="saveData" parameterType="org.example.vo.PublicData" useGeneratedKeys="true">
-        INSERT INTO public_data(id, rnum, name, lon, lat) VALUE (#{id}, #{rnum}, #{name}, #{wgs84Lon}, #{wgs84Lat})
+    <insert id="saveEmergencyData" parameterType="org.example.vo.PublicData" useGeneratedKeys="true">
+        INSERT INTO  public_emergency_data(id, rnum, name, lon, lat) VALUE (#{id}, #{rnum}, #{name}, #{wgs84Lon}, #{wgs84Lat})
     </insert>
+
+    <insert id="savePharmacyData" parameterType="org.example.vo.PublicData" useGeneratedKeys="true">
+        INSERT INTO public_pharmacy_data(id, rnum, name, lon, lat) VALUE (#{id}, #{rnum}, #{name}, #{wgs84Lon}, #{wgs84Lat})
+    </insert>
+
+    <select id="getPharmacyList" resultMap="data" parameterType="map">
+        SELECT id, rnum, name, lon, lat from public_pharmacy_data where lat BETWEEN #{minLat} AND #{maxLat} AND lon BETWEEN #{minLon} AND #{maxLon}
+    </select>
+
+    <select id="getEmergencyList" resultMap="data">
+        SELECT id, rnum, name, lon, lat from public_emergency_data
+    </select>
+
+
 </mapper>

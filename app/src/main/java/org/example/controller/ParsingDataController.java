@@ -3,8 +3,8 @@ package org.example.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.service.ParsingDataService;
 import org.example.vo.PublicData;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -16,14 +16,18 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@RestController
+@Controller
+@RequestMapping("/parsing")
 @RequiredArgsConstructor
 public class ParsingDataController {
 
     private final ParsingDataService parsingDataService;
 
-    @PostMapping("/parsing")
-    public void saveData() throws Exception {
+    @GetMapping
+    public void home(){}
+
+    @GetMapping("/pharmacy")
+    public String savePharmacyData() throws Exception {
         String key = "SdeVRGxeat0HFsYbWRArfdmvZr9D7A4%2FN1IDlh2HxrZcOrO4OX51OU%2FswL7U2GWnhJsKoUjz6OxrW05kc7TYlg%3D%3D";
         String urlBuild1 = "http://apis.data.go.kr/B552657/ErmctInsttInfoInqireService/getParmacyBassInfoInqire" +
                 "?" + URLEncoder.encode("serviceKey", "UTF-8") + "=" + key +
@@ -34,9 +38,32 @@ public class ParsingDataController {
         List<PublicData> data = parsingData(urlBuild1);
         System.out.println("끌어온 데이터:" + data.size());
         for (PublicData publicData : data) {
-            parsingDataService.saveData(publicData);
+            parsingDataService.savePharmacyData(publicData);
         }
         System.out.println("데이터 저장 완료");
+
+        return "redirect:/parsing";
+    }
+
+    @GetMapping("/emergency")
+    public String saveEmergencyData() throws Exception {
+        String key = "SdeVRGxeat0HFsYbWRArfdmvZr9D7A4%2FN1IDlh2HxrZcOrO4OX51OU%2FswL7U2GWnhJsKoUjz6OxrW05kc7TYlg%3D%3D";
+        String urlBuild1 = "http://apis.data.go.kr/B552657/ErmctInfoInqireService/getEgytBassInfoInqire" +
+                "?" + URLEncoder.encode("serviceKey", "UTF-8") + "=" + key +
+                "&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("1000", "UTF-8");
+
+        System.out.println("컨트롤러 진입");
+
+        List<PublicData> data = parsingData(urlBuild1);
+
+        parsingData(urlBuild1);
+        System.out.println("끌어온 데이터:" + data.size());
+        for (PublicData publicData : data) {
+            parsingDataService.saveEmergencyData(publicData);
+        }
+        System.out.println("데이터 저장 완료");
+
+        return "redirect:/parsing";
     }
 
     public List<PublicData> parsingData(String url) throws Exception {
@@ -87,7 +114,6 @@ public class ParsingDataController {
         Document document = builder.parse(new java.io.ByteArrayInputStream(response.toString().getBytes("UTF-8")));
 
         document.getDocumentElement().normalize();
-
         System.out.println(document.getElementsByTagName("totalCount").item(0).getTextContent());
 
         NodeList items = document.getElementsByTagName("item");
@@ -95,10 +121,23 @@ public class ParsingDataController {
         for (int i = 0; i < items.getLength(); i++) {
             PublicData publicData = new PublicData();
             Element item = (Element) items.item(i);
-            publicData.setWgs84Lon(item.getElementsByTagName("wgs84Lon").item(0).getTextContent());
-            publicData.setWgs84Lat(item.getElementsByTagName("wgs84Lat").item(0).getTextContent());
-            publicData.setName(item.getElementsByTagName("dutyName").item(0).getTextContent());
-            publicData.setRnum(item.getElementsByTagName("hpid").item(0).getTextContent());
+//            System.out.println(item);
+
+
+            NodeList test = item.getElementsByTagName("wgs84Lon");
+
+            if (test.getLength() > 0){
+                publicData.setWgs84Lon(item.getElementsByTagName("wgs84Lon").item(0).getTextContent());
+                publicData.setWgs84Lat(item.getElementsByTagName("wgs84Lat").item(0).getTextContent());
+                publicData.setName(item.getElementsByTagName("dutyName").item(0).getTextContent());
+                publicData.setRnum(item.getElementsByTagName("hpid").item(0).getTextContent());
+            }else {
+                publicData.setWgs84Lon("0");
+                publicData.setWgs84Lat("0");
+                publicData.setName(item.getElementsByTagName("dutyName").item(0).getTextContent());
+                publicData.setRnum(item.getElementsByTagName("hpid").item(0).getTextContent());
+            }
+
             list.add(publicData);
         }
         return list;

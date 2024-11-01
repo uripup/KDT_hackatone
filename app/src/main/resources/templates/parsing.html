@@ -1,9 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-
+<html xmlns:th="http://www.thymeleaf.org">
+<head data-th-fragment="head">
+    <meta charset='UTF-8'>
+    <title>데이터 저장소</title>
 </head>
 <body>
+<h1>테스트</h1>
+<p>
+    <a data-th-action="@{parsing/pharmacy}"  href="parsing/pharmacy">약국 데이터 저장</a>
+</p>
 
+<p>
+    <a data-th-action="@{parsing/emergency}" href="parsing/emergency">응급실 데이터 저장</a>
+</p>
 </body>
 </html>
